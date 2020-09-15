@@ -19,7 +19,7 @@
               v-model="activeTargetLayer"
               label="Target"
               color="red"
-              v-on:click="triggerTargetLayer"
+              v-on:click="triggerTargetLayer()"
               hide-details
             ></v-switch>
         </v-list-item>
@@ -30,22 +30,21 @@
       <v-app-bar-nav-icon @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
       <div class="d-flex align-center">
         <v-img
-          alt="Vuetify Logo"
+          alt="Clostra Logo"
           class="shrink mr-2"
           contain
-          src="https://cdn.vuetifyjs.com/images/logos/vuetify-logo-dark.png"
+          src="@/assets/Clostra+logo.png"
           transition="scale-transition"
           width="40"
         />
 
-        <v-img
-          alt="Vuetify Name"
-          class="shrink mt-1 hidden-sm-and-down"
-          contain
-          min-width="100"
-          src="https://cdn.vuetifyjs.com/images/logos/vuetify-name-dark.png"
-          width="100"
-        />
+        <v-btn
+          href="https://www.clostra.com/"
+          target="_blank"
+          text
+        >
+          <span class="mr-2">Clostra</span>
+        </v-btn>
       </div>
 
       <v-spacer></v-spacer>
@@ -83,12 +82,14 @@ export default {
     wwd: null,
     targetLocationsPlacemarkLayer: null,
     walmartLocationsPlacemarkLayer: null,
+    userPlacemarkLayer: null,
     activeTargetLayer: true,
     activeWalmartLayer: true
   }),
 
   methods: {
     triggerWalmartLayer () {
+      console.log('activeWalmartLayer is ' + this.activeWalmartLayer)
       if (!this.activeWalmartLayer) {
         this.removeWalmartLocations();
       } else {
@@ -182,6 +183,10 @@ export default {
     this.walmartLocationsPlacemarkLayer = new WorldWind.RenderableLayer();
     this.wwd.addLayer(this.walmartLocationsPlacemarkLayer);
 
+    //User Placemark Layer
+    this.userPlacemarkLayer = new WorldWind.RenderableLayer();
+    this.wwd.addLayer(this.userPlacemarkLayer);
+
     //this.wwd.addLayer(new WorldWind.CompassLayer());
     this.wwd.addLayer(new WorldWind.CoordinatesDisplayLayer(this.wwd));
     //this.wwd.addLayer(new WorldWind.ViewControlsLayer(this.wwd));
@@ -190,7 +195,25 @@ export default {
 
     this.addTargetLocations();
     this.addWalmartLocations();
-    //this.removeWalmartLocations();
+
+    // Set mouse event listener to handle dynamic user placemarks
+    // Borrowed from GoToLocation.js -> https://github.com/NASAWorldWind/WebWorldWind/blob/develop/examples/GoToLocation.js
+    const self = this;
+    this.wwd.addEventListener("click", function(e) {
+      // Obtain the event location.
+      var x = e.clientX,
+        y = e.clientY;
+
+      // Perform the pick. Must first convert from window coordinates to canvas coordinates, which are
+      // relative to the upper left corner of the canvas rather than the upper left corner of the page.
+      var pickList = self.wwd.pick(self.wwd.canvasCoordinates(x, y));
+
+      // If only one thing is picked and it is the terrain, tell the WorldWindow to go to the picked location.
+      if (pickList.objects.length === 1 && pickList.objects[0].isTerrain) {
+        var position = pickList.objects[0].position;
+        self.wwd.goTo(new WorldWind.Location(position.latitude, position.longitude));
+      }
+    });
   }
 };
 </script>
