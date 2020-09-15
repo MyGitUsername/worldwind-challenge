@@ -23,6 +23,15 @@
               hide-details
             ></v-switch>
         </v-list-item>
+        <v-list-item></v-list-item>
+        <v-divider></v-divider>
+        <v-list-item></v-list-item>
+        <v-list-item>
+          <v-btn @click="canPlaceMarker = !canPlaceMarker">
+            <v-img right src="@/assets/plain-black.png" aspect-ratio="1"></v-img>
+            Place Marker
+          </v-btn>
+        </v-list-item>
       </v-list>
     </v-navigation-drawer>
 
@@ -84,7 +93,8 @@ export default {
     walmartLocationsPlacemarkLayer: null,
     userPlacemarkLayer: null,
     activeTargetLayer: true,
-    activeWalmartLayer: true
+    activeWalmartLayer: true,
+    canPlaceMarker: false // If set to true, click on wwd will add placemarker
   }),
 
   methods: {
@@ -117,12 +127,15 @@ export default {
         placemarkAttributes.labelAttributes.color = WorldWind.Color.RED;
       } else if (store === "walmart") {
         placemarkAttributes.labelAttributes.color = WorldWind.Color.BLUE;
+      } else if (store === "user") {
+        placemarkAttributes.labelAttributes.color = WorldWind.Color.WHITE;
       }
+
       placemarkAttributes.labelAttributes.offset = new WorldWind.Offset(
         WorldWind.OFFSET_FRACTION, 0.5,
         WorldWind.OFFSET_FRACTION, 1.0);
 
-      placemarkAttributes.imageSource = '../assets/push-pin-red.png';
+      placemarkAttributes.imageSource = '@/assets/plain-red.png';
 
       return placemarkAttributes;
     },
@@ -200,18 +213,28 @@ export default {
     // Borrowed from GoToLocation.js -> https://github.com/NASAWorldWind/WebWorldWind/blob/develop/examples/GoToLocation.js
     const self = this;
     this.wwd.addEventListener("click", function(e) {
+      console.log('self.canPlaceMarker is ' + self.canPlaceMarker)
+      if (!self.canPlaceMarker) return
       // Obtain the event location.
-      var x = e.clientX,
+      const x = e.clientX,
         y = e.clientY;
 
       // Perform the pick. Must first convert from window coordinates to canvas coordinates, which are
       // relative to the upper left corner of the canvas rather than the upper left corner of the page.
-      var pickList = self.wwd.pick(self.wwd.canvasCoordinates(x, y));
+      const pickList = self.wwd.pick(self.wwd.canvasCoordinates(x, y));
 
       // If only one thing is picked and it is the terrain, tell the WorldWindow to go to the picked location.
       if (pickList.objects.length === 1 && pickList.objects[0].isTerrain) {
-        var position = pickList.objects[0].position;
-        self.wwd.goTo(new WorldWind.Location(position.latitude, position.longitude));
+        const position = pickList.objects[0].position;
+        const placemarkAttributes = self.defineLocationPlacemarkAttributes("user")
+
+        var placemark = new WorldWind.Placemark(position, false, placemarkAttributes);
+
+        placemark.label = "My Placemark\n" +
+          "Lat " + placemark.position.latitude.toPrecision(4).toString() + "\n" +
+          "Lon " + placemark.position.longitude.toPrecision(5).toString();
+        placemark.alwaysOnTop = true;
+        self.userPlacemarkLayer.addRenderable(placemark);
       }
     });
   }
