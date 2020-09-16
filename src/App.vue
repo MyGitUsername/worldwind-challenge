@@ -93,12 +93,12 @@
           alt="NASA Logo"
           class="shrink mr-2 nasa-logo"
           contain
-          src="@/assets/918px-NASA_logo.svg"
+          src="@/assets/1200px-NASA_logo.png"
           transition="scale-transition"
           width="70"
         />
         </a>
-          <div>NASA WorldWind </div>
+        <div>NASA WorldWind </div>
     </v-app-bar>
 
     <v-main>
