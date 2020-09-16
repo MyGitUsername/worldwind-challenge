@@ -7,6 +7,7 @@
       <v-list dense>
         <v-list-item>
            <v-switch
+              v-model="activeWalmartLayer"
               label="Walmart"
               color="blue darken-1"
               v-on:click="triggerWalmartLayer()"
@@ -15,6 +16,7 @@
         </v-list-item>
         <v-list-item>
            <v-switch
+              v-model="activeTargetLayer"
               label="Target"
               color="red"
               v-on:click="triggerTargetLayer()"
@@ -150,11 +152,13 @@ export default {
     triggerWalmartLayer () {
       this.walmartLocationsPlacemarkLayer.enabled = !this.walmartLocationsPlacemarkLayer.enabled;
       this.wwd.redraw();
+      this.activeWalmartLayer = this.walmartLocationsPlacemarkLayer.enabled;
     },
 
     triggerTargetLayer () {
-      this.walmartLocationsPlacemarkLayer.enabled = !this.walmartLocationsPlacemarkLayer.enabled;
+      this.targetLocationsPlacemarkLayer.enabled = !this.targetLocationsPlacemarkLayer.enabled;
       this.wwd.redraw();
+      this.activeTargetLayer = this.targetLocationsPlacemarkLayer.enabled;
     },
 
     setAnnotationAttributes () {
