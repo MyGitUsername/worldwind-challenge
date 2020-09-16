@@ -9,7 +9,7 @@
            <v-switch
               v-model="activeWalmartLayer"
               label="Walmart"
-              color="blue"
+              color="blue darken-1"
               v-on:click="triggerWalmartLayer()"
               hide-details
             ></v-switch>
@@ -79,20 +79,19 @@
           <v-text-field
           v-model="annotationText"
           value="Edit Annotation Text"
-          label="Edit Annotation Text"
         ></v-text-field>
 
         <v-card-actions>
           <v-spacer></v-spacer>
           <v-btn
-            color="green darken-1"
+            color="blue darken-1"
             text
             @click="pickedObject.text = annotationText; showEditAnnotationDialog = false;"
           >
             Submit
           </v-btn>
           <v-btn
-            color="green darken-1"
+            color="blue darken-1"
             text
             @click="showEditAnnotationDialog = false"
           >
@@ -266,13 +265,26 @@ export default {
     // Set mouse event listener to handle dynamic user placemarks
     // Borrowed from GoToLocation.js -> https://github.com/NASAWorldWind/WebWorldWind/blob/develop/examples/GoToLocation.js
     const self = this;
-    this.wwd.addEventListener("click", function(e) {
+    this.wwd.addEventListener("drag", function(e) {
+      // Obtain the event location.
+      const x = e.clientX,
+        y = e.clientY;
+      console.log('on drag end the new coors are ' + x + ', ' + y)
+    })
+
+    new WorldWind.DragRecognizer(this.wwd, function() {
+      return;
+    });
+
+    new WorldWind.ClickRecognizer(this.wwd, function(e) {
       // Obtain the event location.
       const x = e.clientX,
         y = e.clientY;
 
 
-      if (self.canPlaceMarker) {
+      if(e.shiftKey) {
+        console.log('click and drag time')
+      } else if (self.canPlaceMarker) {
 
         // Perform the pick. Must first convert from window coordinates to canvas coordinates, which are
         // relative to the upper left corner of the canvas rather than the upper left corner of the page.
@@ -306,11 +318,13 @@ export default {
         var pickList = self.wwd.pick(self.wwd.canvasCoordinates(x, y));
         if (!pickList.hasNonTerrainObjects()) return;
         console.log('get picklist ' + pickList.topPickedObject().userObject);
-        self.showEditAnnotationDialog = true;
-        self.pickedObject = pickList.topPickedObject().userObject;
-
+        const topPickedObject = pickList.topPickedObject().userObject;
+        if (topPickedObject.text !== undefined) {  //FIXME: hacky solution to ignore placemarkers
+          self.showEditAnnotationDialog = true;
+          self.pickedObject = topPickedObject;
+          self.annotationText = topPickedObject.text;
+        }
       }
-
 
     });
   }
