@@ -2,6 +2,8 @@
   <v-app>
     <v-navigation-drawer
       v-model="drawer"
+      color="black"
+      dark
       app
       >
       <v-list dense>
@@ -36,7 +38,7 @@
               <template v-slot:activator="{ on, attrs }">
                 <v-btn @click="canPlaceMarker = !canPlaceMarker; canMoveMarker = false; objectToMove = null"
                   outlined
-                  color="grey darken-4"
+                  color="grey"
                   v-on="on"
                   v-bind="attrs"
                   class="ml-3"
@@ -50,7 +52,8 @@
               <template v-slot:activator="{ on, attrs }">
             <v-btn @click="canPlaceMarker = false; canMoveMarker = !canMoveMarker"
               outlined
-              color="grey darken-4"
+              color="grey"
+              active-class="background-color: white;"
               v-on="on"
               v-bind="attrs"
               class="ml-3"
@@ -384,9 +387,12 @@ div.container {
 }
 
 #canvasOne {
+  position: absolute;
   background-color: black;
   width: 100%;
   max-height: 100%;
+  min-height: 100%;
+
 }
 
 .v-main {
