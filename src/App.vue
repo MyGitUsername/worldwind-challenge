@@ -52,34 +52,36 @@
     <v-app-bar app color="primary" dark>
       <v-app-bar-nav-icon @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
       <div class="d-flex align-center">
+        <a
+          href="https://www.clostra.com/"
+        >
         <v-img
           alt="Clostra Logo"
           class="shrink mr-2"
           contain
-          src="@/assets/Clostra+logo.png"
+          src="@/assets/Clostra+Logo+White.png"
           transition="scale-transition"
-          width="40"
+          width="160"
         />
 
-        <v-btn
-          href="https://www.clostra.com/"
-          target="_blank"
-          text
-        >
-          <span class="mr-2">Clostra</span>
-        </v-btn>
+        </a>
       </div>
 
       <v-spacer></v-spacer>
 
-      <v-btn
-        href="https://github.com/vuetifyjs/vuetify/releases/latest"
-        target="_blank"
-        text
-      >
-        <span class="mr-2">Latest Release</span>
-        <v-icon>mdi-open-in-new</v-icon>
-      </v-btn>
+        <a
+          href="https://worldwind.arc.nasa.gov/"
+        >
+        <v-img
+          alt="NASA Logo"
+          class="shrink mr-2"
+          contain
+          src="@/assets/918px-NASA_logo.svg"
+          transition="scale-transition"
+          width="70"
+        />
+        </a>
+          <div>NASA WorldWind </div>
     </v-app-bar>
 
     <v-main>
@@ -93,6 +95,7 @@
           <v-text-field
           v-model="annotationText"
           value="Edit Annotation Text"
+          class="pl-6 pr-12"
         ></v-text-field>
 
         <v-card-actions>
@@ -188,10 +191,10 @@ export default {
 
       if (store === "target") {
         placemarkAttributes.labelAttributes.color = WorldWind.Color.RED;
-        placemarkAttributes.imageSource = "https://files.worldwind.arc.nasa.gov/artifactory/web/0.9.0/images/pushpins/castshadow-red.png"
+        placemarkAttributes.imageSource = "https://files.worldwind.arc.nasa.gov/artifactory/web/0.9.0/images/pushpins/plain-red.png"
       } else if (store === "walmart") {
         placemarkAttributes.labelAttributes.color = WorldWind.Color.BLUE;
-        placemarkAttributes.imageSource = "https://files.worldwind.arc.nasa.gov/artifactory/web/0.9.0/images/pushpins/castshadow-blue.png"
+        placemarkAttributes.imageSource = "https://files.worldwind.arc.nasa.gov/artifactory/web/0.9.0/images/pushpins/plain-blue.png"
       } else if (store === "user") {
         placemarkAttributes.labelAttributes.color = WorldWind.Color.WHITE;
       }
@@ -263,8 +266,8 @@ export default {
     //this.wwd.addLayer(new WorldWind.ViewControlsLayer(this.wwd));
 
 
-    this.addTargetLocations();
-    this.addWalmartLocations();
+    //this.addTargetLocations();
+    //this.addWalmartLocations();
 
     // Set mouse event listener to handle dynamic user placemarks
     // Borrowed from GoToLocation.js -> https://github.com/NASAWorldWind/WebWorldWind/blob/develop/examples/GoToLocation.js
@@ -288,18 +291,14 @@ export default {
         y = e.clientY;
 
       if (self.canMoveMarker && !self.canPlaceMarker) {
-        console.log('in move marker')
         const pickList = self.wwd.pick(self.wwd.canvasCoordinates(x, y));
 
         if (!self.objectToMove) { // pick up object on first click
-          console.log('no object has been selected to drop')
           if (!pickList.hasNonTerrainObjects()) return;
           self.objectToMove = pickList.topPickedObject().userObject;
-          console.log('picked ' + self.objectToMove + ' to move')
 
         // If only one thing is picked and it is the terrain, change the object location to that terrain position
         } else if (pickList.objects.length === 1 && pickList.objects[0].isTerrain && self.objectToMove) {
-          console.log('going to drop object at new coors')
           self.objectToMove.position = pickList.objects[0].position;
           self.objectToMove = null; // reset objectToMove
           self.wwd.redraw()
@@ -322,9 +321,6 @@ export default {
           const annotation = new WorldWind.Annotation(position, annotationAttributes);
           annotation.displayName = "My Placemark";
           annotation.text = "Marker " + self.customMarkerCounter++;
-          new WorldWind.DragRecognizer(annotation, function() {
-            console.log('draggining annotation')
-          });
           self.userPlacemarkLayer.addRenderable(annotation);
 
           /*
