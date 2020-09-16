@@ -185,8 +185,10 @@ export default {
 
       if (store === "target") {
         placemarkAttributes.labelAttributes.color = WorldWind.Color.RED;
+        placemarkAttributes.imageSource = "https://files.worldwind.arc.nasa.gov/artifactory/web/0.9.0/images/pushpins/castshadow-red.png"
       } else if (store === "walmart") {
         placemarkAttributes.labelAttributes.color = WorldWind.Color.BLUE;
+        placemarkAttributes.imageSource = "https://files.worldwind.arc.nasa.gov/artifactory/web/0.9.0/images/pushpins/castshadow-blue.png"
       } else if (store === "user") {
         placemarkAttributes.labelAttributes.color = WorldWind.Color.WHITE;
       }
@@ -195,8 +197,7 @@ export default {
         WorldWind.OFFSET_FRACTION, 0.5,
         WorldWind.OFFSET_FRACTION, 1.0);
 
-      placemarkAttributes.imageScale = 8; //Fixme
-      placemarkAttributes.imageSource = "@/assets/plain-red.png";
+      placemarkAttributes.imageScale = .5; //Fixme
 
       return placemarkAttributes;
     },
@@ -209,9 +210,11 @@ export default {
         var position = new WorldWind.Position(store.latitude, store.longitude, 100.0);
         var placemark = new WorldWind.Placemark(position, false, placemarkAttributes);
 
+        /*
         placemark.label = "Target\n" +
           "Lat " + placemark.position.latitude.toPrecision(4).toString() + "\n" +
           "Lon " + placemark.position.longitude.toPrecision(5).toString();
+        */
         placemark.alwaysOnTop = true;
 
         self.targetLocationsPlacemarkLayer.addRenderable(placemark);
@@ -226,9 +229,11 @@ export default {
         var position = new WorldWind.Position(store.latitude, store.longitude, 100.0);
         var placemark = new WorldWind.Placemark(position, false, placemarkAttributes);
 
+        /*
         placemark.label = "Walmart\n" +
           "Lat " + placemark.position.latitude.toPrecision(4).toString() + "\n" +
           "Lon " + placemark.position.longitude.toPrecision(5).toString();
+        */
         placemark.alwaysOnTop = true;
 
         self.walmartLocationsPlacemarkLayer.addRenderable(placemark);
@@ -272,6 +277,7 @@ export default {
     // Set mouse event listener to handle dynamic user placemarks
     // Borrowed from GoToLocation.js -> https://github.com/NASAWorldWind/WebWorldWind/blob/develop/examples/GoToLocation.js
     const self = this;
+    /*
     this.wwd.addEventListener("mouseup", function(e) {
       if (e.shiftKey) {
           console.log('click and drag')
@@ -281,10 +287,8 @@ export default {
         console.log('on drag end the new coors are ' + x + ', ' + y)
       }
     });
+    */
 
-    new WorldWind.DragRecognizer(this.wwd, function() {
-      return;
-    });
 
     new WorldWind.ClickRecognizer(this.wwd, function(e) {
       // Obtain the event location.
@@ -306,6 +310,9 @@ export default {
           const annotation = new WorldWind.Annotation(position, annotationAttributes);
           annotation.displayName = "My Placemark";
           annotation.text = "Marker " + self.customMarkerCounter++;
+          new WorldWind.DragRecognizer(annotation, function() {
+            console.log('draggining annotation')
+          });
           self.userPlacemarkLayer.addRenderable(annotation);
 
           /*
@@ -338,9 +345,4 @@ export default {
 };
 </script>
 <style scoped>
-.placeMarkerActive {
-  background-color: #e57373;
-}
-
-
 </style>
