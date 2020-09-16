@@ -27,17 +27,16 @@
         <v-divider></v-divider>
         <v-list-item></v-list-item>
         <v-list-item>
-           <v-btn-toggle
-          v-model="text"
-          tile
-          color="blue-grey darken-3"
-          group
-        >
-          <v-btn @click="canPlaceMarker = !canPlaceMarker"
-            :class="{placeMarkerActive: canPlaceMarker}">
-            <v-img right src="@/assets/plain-black.png" aspect-ratio="1"></v-img>
+          <v-btn-toggle
+            tile
+            color="grey darken-4"
+            group
+            >
+            <v-btn @click="canPlaceMarker = !canPlaceMarker"
+              :class="{placeMarkerActive: canPlaceMarker}">
+              <v-img right src="@/assets/plain-black.png" aspect-ratio="1"></v-img>
             Place Marker
-          </v-btn>
+            </v-btn>
           </v-btn-toggle>
         </v-list-item>
       </v-list>
@@ -163,7 +162,7 @@ export default {
        // Set default annotation attributes.
         const annotationAttributes = new WorldWind.AnnotationAttributes(null);
         annotationAttributes.cornerRadius = 14;
-        annotationAttributes.backgroundColor = WorldWind.Color.GREEN;
+        annotationAttributes.backgroundColor = WorldWind.Color.MEDIUM_GRAY;
         annotationAttributes.drawLeader = true;
         annotationAttributes.leaderGapWidth = 40;
         annotationAttributes.leaderGapHeight = 30;
