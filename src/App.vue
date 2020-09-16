@@ -69,6 +69,38 @@
     </v-app-bar>
 
     <v-main>
+       <v-dialog
+      v-model="showEditAnnotationDialog"
+      max-width="290"
+    >
+      <v-card>
+        <v-card-title class="headline">Edit Marker</v-card-title>
+
+          <v-text-field
+          v-model="annotationText"
+          value="Edit Annotation Text"
+          label="Edit Annotation Text"
+        ></v-text-field>
+
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn
+            color="green darken-1"
+            text
+            @click="pickedObject.text = annotationText; showEditAnnotationDialog = false;"
+          >
+            Submit
+          </v-btn>
+          <v-btn
+            color="green darken-1"
+            text
+            @click="showEditAnnotationDialog = false"
+          >
+            Cancel
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
       <v-container>
         <canvas id="canvasOne" width="1024" height="768">
           Your browser does not support HTML5 Canvas.
@@ -80,7 +112,6 @@
 
 <script>
 import WorldWind from "@nasaworldwind/worldwind";
-import AnnotationController from "@nasaworldwind/worldwind";
 import targetLocationsJson from "@/assets/target-locations.json";
 import walmartLocationsJson from "@/assets/walmart-locations.json";
 
@@ -95,7 +126,11 @@ export default {
     userPlacemarkLayer: null,
     activeTargetLayer: true,
     activeWalmartLayer: true,
-    canPlaceMarker: false // If set to true, click on wwd will add placemarker
+    canPlaceMarker: false, // If set to true, click on wwd will add placemarker
+    showEditAnnotationDialog: false,
+    pickedObject: null, // Store a reference to the last pickedObject
+    annotationText: "",
+    customMarkerCounter: 0
   }),
 
   methods: {
@@ -232,40 +267,51 @@ export default {
     // Borrowed from GoToLocation.js -> https://github.com/NASAWorldWind/WebWorldWind/blob/develop/examples/GoToLocation.js
     const self = this;
     this.wwd.addEventListener("click", function(e) {
-      console.log('self.canPlaceMarker is ' + self.canPlaceMarker)
-      if (!self.canPlaceMarker) return
       // Obtain the event location.
       const x = e.clientX,
         y = e.clientY;
 
-      // Perform the pick. Must first convert from window coordinates to canvas coordinates, which are
-      // relative to the upper left corner of the canvas rather than the upper left corner of the page.
-      const pickList = self.wwd.pick(self.wwd.canvasCoordinates(x, y));
 
-      // If only one thing is picked and it is the terrain, tell the WorldWindow to go to the picked location.
-      if (pickList.objects.length === 1 && pickList.objects[0].isTerrain) {
-        const position = pickList.objects[0].position;
-        //const placemarkAttributes = self.defineLocationPlacemarkAttributes("user")
+      if (self.canPlaceMarker) {
 
-        const annotationAttributes = self.setAnnotationAttributes();
-        const annotation = new WorldWind.Annotation(position, annotationAttributes);
-        annotation.displayName = "My Placemark";
-        annotation.text = "text";
-        self.userPlacemarkLayer.addRenderable(annotation);
+        // Perform the pick. Must first convert from window coordinates to canvas coordinates, which are
+        // relative to the upper left corner of the canvas rather than the upper left corner of the page.
+        const pickList = self.wwd.pick(self.wwd.canvasCoordinates(x, y));
 
-        var annotationController = new AnnotationController(self.wwd);
-        annotationController.load(annotation);
-        /*
-        var placemark = new WorldWind.Placemark(position);
-        console.log('placemark is ' + JSON.stringify(placemark))
+        // If only one thing is picked and it is the terrain, tell the WorldWindow to go to the picked location.
+        if (pickList.objects.length === 1 && pickList.objects[0].isTerrain) {
+          const position = pickList.objects[0].position;
+          //const placemarkAttributes = self.defineLocationPlacemarkAttributes("user")
 
-        placemark.label = "My Placemark\n" +
-          "Lat " + placemark.position.latitude.toPrecision(4).toString() + "\n" +
-          "Lon " + placemark.position.longitude.toPrecision(5).toString();
-        placemark.alwaysOnTop = true;
-        self.userPlacemarkLayer.addRenderable(placemark);
-        */
+          const annotationAttributes = self.setAnnotationAttributes();
+          const annotation = new WorldWind.Annotation(position, annotationAttributes);
+          annotation.displayName = "My Placemark";
+          annotation.text = "Marker " + self.customMarkerCounter++;
+          self.userPlacemarkLayer.addRenderable(annotation);
+
+          /*
+          var placemark = new WorldWind.Placemark(position);
+          console.log('placemark is ' + JSON.stringify(placemark))
+
+          placemark.label = "My Placemark\n" +
+            "Lat " + placemark.position.latitude.toPrecision(4).toString() + "\n" +
+            "Lon " + placemark.position.longitude.toPrecision(5).toString();
+          placemark.alwaysOnTop = true;
+          self.userPlacemarkLayer.addRenderable(placemark);
+          */
+        }
+      } else {
+
+        // see what the user is picking
+        var pickList = self.wwd.pick(self.wwd.canvasCoordinates(x, y));
+        if (!pickList.hasNonTerrainObjects()) return;
+        console.log('get picklist ' + pickList.topPickedObject().userObject);
+        self.showEditAnnotationDialog = true;
+        self.pickedObject = pickList.topPickedObject().userObject;
+
       }
+
+
     });
   }
 };
