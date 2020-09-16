@@ -29,14 +29,21 @@
         <v-list-item>
           <v-btn-toggle
             tile
-            color="grey darken-4"
+            color="yellow "
             group
             >
-            <v-btn @click="canPlaceMarker = !canPlaceMarker"
-              :class="{placeMarkerActive: canPlaceMarker}">
-              <v-img right src="@/assets/plain-black.png" aspect-ratio="1"></v-img>
+            <v-row>
+            <v-btn @click="canPlaceMarker = !canPlaceMarker; canMoveMarker = false"
+              outlined
+              >
             Place Marker
             </v-btn>
+            <v-btn @click="canPlaceMarker = false; canMoveMarker = !canMoveMarker"
+              outlined
+              >
+            Move Marker Mode
+            </v-btn>
+            </v-row>
           </v-btn-toggle>
         </v-list-item>
       </v-list>
@@ -133,10 +140,12 @@ export default {
     activeTargetLayer: true,
     activeWalmartLayer: true,
     canPlaceMarker: false, // If set to true, click on wwd will add placemarker
+    canMoveMarker: false,
     showEditAnnotationDialog: false,
     pickedObject: null, // Store a reference to the last pickedObject
     annotationText: "",
-    customMarkerCounter: 0
+    customMarkerCounter: 0,
+    objectToMove: null
   }),
 
   methods: {
@@ -295,7 +304,27 @@ export default {
       const x = e.clientX,
         y = e.clientY;
 
-      if (self.canPlaceMarker) {
+      if (self.canMoveMarker && !self.canPlaceMarker) {
+        console.log('in move marker')
+        const pickList = self.wwd.pick(self.wwd.canvasCoordinates(x, y));
+
+        if (!self.objectToMove) { // pick up object on first click
+          console.log('no object has been selected to drop')
+          if (!pickList.hasNonTerrainObjects()) return;
+          self.objectToMove = pickList.topPickedObject().userObject;
+          console.log('picked ' + self.objectToMove + ' to move')
+
+        // If only one thing is picked and it is the terrain, change the object location to that terrain position
+        } else if (pickList.objects.length === 1 && pickList.objects[0].isTerrain && self.objectToMove) {
+          console.log('going to drop object at new coors')
+          self.objectToMove.position = pickList.objects[0].position;
+          self.objectToMove = null; // reset objectToMove
+          self.wwd.redraw()
+        }
+
+      }
+
+      if (self.canPlaceMarker && !self.canMoveMarker) {
 
         // Perform the pick. Must first convert from window coordinates to canvas coordinates, which are
         // relative to the upper left corner of the canvas rather than the upper left corner of the page.
@@ -326,7 +355,9 @@ export default {
           self.userPlacemarkLayer.addRenderable(placemark);
           */
         }
-      } else {
+      }
+
+      if (!self.canPlaceMarker && !self.canMoveMarker) {
 
         // see what the user is picking
         var pickList = self.wwd.pick(self.wwd.canvasCoordinates(x, y));
@@ -345,4 +376,7 @@ export default {
 };
 </script>
 <style scoped>
+#canvasOne {
+  width: 70%;
+}
 </style>
