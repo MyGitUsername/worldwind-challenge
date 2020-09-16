@@ -27,10 +27,18 @@
         <v-divider></v-divider>
         <v-list-item></v-list-item>
         <v-list-item>
-          <v-btn @click="canPlaceMarker = !canPlaceMarker">
+           <v-btn-toggle
+          v-model="text"
+          tile
+          color="blue-grey darken-3"
+          group
+        >
+          <v-btn @click="canPlaceMarker = !canPlaceMarker"
+            :class="{placeMarkerActive: canPlaceMarker}">
             <v-img right src="@/assets/plain-black.png" aspect-ratio="1"></v-img>
             Place Marker
           </v-btn>
+          </v-btn-toggle>
         </v-list-item>
       </v-list>
     </v-navigation-drawer>
@@ -330,3 +338,10 @@ export default {
   }
 };
 </script>
+<style scoped>
+.placeMarkerActive {
+  background-color: #e57373;
+}
+
+
+</style>
