@@ -80,6 +80,7 @@
 
 <script>
 import WorldWind from "@nasaworldwind/worldwind";
+import AnnotationController from "@nasaworldwind/worldwind";
 import targetLocationsJson from "@/assets/target-locations.json";
 import walmartLocationsJson from "@/assets/walmart-locations.json";
 
@@ -116,6 +117,24 @@ export default {
       }
     },
 
+    setAnnotationAttributes () {
+       // Set default annotation attributes.
+        const annotationAttributes = new WorldWind.AnnotationAttributes(null);
+        annotationAttributes.cornerRadius = 14;
+        annotationAttributes.backgroundColor = WorldWind.Color.GREEN;
+        annotationAttributes.drawLeader = true;
+        annotationAttributes.leaderGapWidth = 40;
+        annotationAttributes.leaderGapHeight = 30;
+        annotationAttributes.opacity = 1;
+        annotationAttributes.scale = 1;
+        annotationAttributes.width = 200;
+        annotationAttributes.height = 100;
+        annotationAttributes.textAttributes.color = WorldWind.Color.BLACK;
+        annotationAttributes.insets = new WorldWind.Insets(10, 10, 10, 10);
+
+        return annotationAttributes;
+    },
+
     defineLocationPlacemarkAttributes (store) {
       const placemarkAttributes = new WorldWind.PlacemarkAttributes(null);
 
@@ -135,7 +154,8 @@ export default {
         WorldWind.OFFSET_FRACTION, 0.5,
         WorldWind.OFFSET_FRACTION, 1.0);
 
-      placemarkAttributes.imageSource = '@/assets/plain-red.png';
+      placemarkAttributes.imageScale = 8; //Fixme
+      placemarkAttributes.imageSource = "@/assets/plain-red.png";
 
       return placemarkAttributes;
     },
@@ -204,7 +224,6 @@ export default {
     this.wwd.addLayer(new WorldWind.CoordinatesDisplayLayer(this.wwd));
     //this.wwd.addLayer(new WorldWind.ViewControlsLayer(this.wwd));
 
-    //this.addPlacemarkers();
 
     this.addTargetLocations();
     this.addWalmartLocations();
@@ -226,15 +245,26 @@ export default {
       // If only one thing is picked and it is the terrain, tell the WorldWindow to go to the picked location.
       if (pickList.objects.length === 1 && pickList.objects[0].isTerrain) {
         const position = pickList.objects[0].position;
-        const placemarkAttributes = self.defineLocationPlacemarkAttributes("user")
+        //const placemarkAttributes = self.defineLocationPlacemarkAttributes("user")
 
-        var placemark = new WorldWind.Placemark(position, false, placemarkAttributes);
+        const annotationAttributes = self.setAnnotationAttributes();
+        const annotation = new WorldWind.Annotation(position, annotationAttributes);
+        annotation.displayName = "My Placemark";
+        annotation.text = "text";
+        self.userPlacemarkLayer.addRenderable(annotation);
+
+        var annotationController = new AnnotationController(self.wwd);
+        annotationController.load(annotation);
+        /*
+        var placemark = new WorldWind.Placemark(position);
+        console.log('placemark is ' + JSON.stringify(placemark))
 
         placemark.label = "My Placemark\n" +
           "Lat " + placemark.position.latitude.toPrecision(4).toString() + "\n" +
           "Lon " + placemark.position.longitude.toPrecision(5).toString();
         placemark.alwaysOnTop = true;
         self.userPlacemarkLayer.addRenderable(placemark);
+        */
       }
     });
   }
