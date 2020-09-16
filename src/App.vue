@@ -265,12 +265,15 @@ export default {
     // Set mouse event listener to handle dynamic user placemarks
     // Borrowed from GoToLocation.js -> https://github.com/NASAWorldWind/WebWorldWind/blob/develop/examples/GoToLocation.js
     const self = this;
-    this.wwd.addEventListener("drag", function(e) {
-      // Obtain the event location.
-      const x = e.clientX,
-        y = e.clientY;
-      console.log('on drag end the new coors are ' + x + ', ' + y)
-    })
+    this.wwd.addEventListener("mouseup", function(e) {
+      if (e.shiftKey) {
+          console.log('click and drag')
+        // Obtain the event location.
+        const x = e.clientX,
+          y = e.clientY;
+        console.log('on drag end the new coors are ' + x + ', ' + y)
+      }
+    });
 
     new WorldWind.DragRecognizer(this.wwd, function() {
       return;
@@ -281,10 +284,7 @@ export default {
       const x = e.clientX,
         y = e.clientY;
 
-
-      if(e.shiftKey) {
-        console.log('click and drag time')
-      } else if (self.canPlaceMarker) {
+      if (self.canPlaceMarker) {
 
         // Perform the pick. Must first convert from window coordinates to canvas coordinates, which are
         // relative to the upper left corner of the canvas rather than the upper left corner of the page.
