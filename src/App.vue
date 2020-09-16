@@ -39,6 +39,7 @@
                   color="grey darken-4"
                   v-on="on"
                   v-bind="attrs"
+                  class="ml-3"
                   >
                   Place Marker Mode
                 </v-btn>
@@ -52,6 +53,7 @@
               color="grey darken-4"
               v-on="on"
               v-bind="attrs"
+              class="ml-3"
               >
               Move Marker Mode
             </v-btn>
@@ -89,7 +91,7 @@
         >
         <v-img
           alt="NASA Logo"
-          class="shrink mr-2"
+          class="shrink mr-2 nasa-logo"
           contain
           src="@/assets/918px-NASA_logo.svg"
           transition="scale-transition"
@@ -207,6 +209,8 @@ export default {
       if (store === "target") {
         placemarkAttributes.labelAttributes.color = WorldWind.Color.RED;
         placemarkAttributes.imageSource = "https://files.worldwind.arc.nasa.gov/artifactory/web/0.9.0/images/pushpins/plain-red.png"
+        //placemarkAttributes.imageSource = WorldWind.WWUtil.currentUrlSansFilePart() + "./assets/pushpins/plain-red.png"
+        console.log('source ' + placemarkAttributes.imageSource)
       } else if (store === "walmart") {
         placemarkAttributes.labelAttributes.color = WorldWind.Color.BLUE;
         placemarkAttributes.imageSource = "https://files.worldwind.arc.nasa.gov/artifactory/web/0.9.0/images/pushpins/plain-blue.png"
@@ -218,7 +222,7 @@ export default {
         WorldWind.OFFSET_FRACTION, 0.5,
         WorldWind.OFFSET_FRACTION, 1.0);
 
-      placemarkAttributes.imageScale = .5; //Fixme
+      placemarkAttributes.imageScale = .4; //Fixme
 
       return placemarkAttributes;
     },
@@ -247,60 +251,35 @@ export default {
 
         self.walmartLocationsPlacemarkLayer.addRenderable(placemark);
       });
-    },
-
-    removeWalmartLocations () {
-      this.wwd.removeLayer(this.walmartLocationsPlacemarkLayer)
-    },
-
-    removeTargetLocations () {
-      this.wwd.removeLayer(this.targetLocationsPlacemarkLayer)
     }
   },
 
   mounted () {
     // Add Layers
     this.wwd = new WorldWind.WorldWindow("canvasOne");
-    this.wwd.addLayer(new WorldWind.BMNGOneImageLayer());
+    //this.wwd.addLayer(new WorldWind.BMNGOneImageLayer());
     this.wwd.addLayer(new WorldWind.BMNGLandsatLayer());
-    this.wwd.addLayer(new WorldWind.StarFieldLayer());
 
     //Target Stores Placemark Layer
     this.targetLocationsPlacemarkLayer = new WorldWind.RenderableLayer();
     this.wwd.addLayer(this.targetLocationsPlacemarkLayer);
+    this.triggerTargetLayer(); // start with layer off
 
     //Walmart Stores Placemark Layer
     this.walmartLocationsPlacemarkLayer = new WorldWind.RenderableLayer();
     this.wwd.addLayer(this.walmartLocationsPlacemarkLayer);
+    this.triggerWalmartLayer(); // start with layer off
 
     //User Placemark Layer
     this.userPlacemarkLayer = new WorldWind.RenderableLayer();
     this.wwd.addLayer(this.userPlacemarkLayer);
 
-    //this.wwd.addLayer(new WorldWind.CompassLayer());
-    this.wwd.addLayer(new WorldWind.CoordinatesDisplayLayer(this.wwd));
-    //this.wwd.addLayer(new WorldWind.ViewControlsLayer(this.wwd));
-
-
-    //this.addTargetLocations();
-    //this.addWalmartLocations();
+    this.addTargetLocations();
+    this.addWalmartLocations();
 
     // Set mouse event listener to handle dynamic user placemarks
     // Borrowed from GoToLocation.js -> https://github.com/NASAWorldWind/WebWorldWind/blob/develop/examples/GoToLocation.js
     const self = this;
-    /*
-    this.wwd.addEventListener("mouseup", function(e) {
-      if (e.shiftKey) {
-          console.log('click and drag')
-        // Obtain the event location.
-        const x = e.clientX,
-          y = e.clientY;
-        console.log('on drag end the new coors are ' + x + ', ' + y)
-      }
-    });
-    */
-
-
     new WorldWind.ClickRecognizer(this.wwd, function(e) {
       // Obtain the event location.
       const x = e.clientX,
@@ -371,6 +350,7 @@ export default {
 };
 </script>
 <style scoped>
+/* Avoid overlap of nav drawer and app-bar.  Source: https://codepen.io/hamedbaatour/pen/gOpwwjJ */
 header {
   postion: absolute !important;
   top:0 !important;
@@ -387,17 +367,26 @@ main {
   padding: 2rem;
 }
 
+/*
+.v-main {
+  max-height: calc(100% - 80px);
+  height: calc(100% - 80px);
+}
+*/
+
 div.container {
+  postion: absolute !important;
   height: 100%;
   width: 100%;
-  margin: 0px 0px 0px 0px;
-  padding-bottom: 0px;
-  padding-right: 0px;
+  margin: 0px 0px 0px 0px !important;
+  padding: 0px 0px 0px 0px !important;
+  max-width: none !important;
 }
 
 #canvasOne {
   background-color: black;
   width: 100%;
+  max-height: 100%;
 }
 
 .v-main {
