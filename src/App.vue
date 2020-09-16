@@ -58,7 +58,7 @@
               Move Marker Mode
             </v-btn>
               </template>
-            <span>Select this mode, click on a custom marker, and then click on the map to move it</span>
+            <span>Select this mode, click on a custom marker, and then click a new location on the map</span>
             </v-tooltip>
             </v-row>
           </v-btn-toggle>
@@ -66,7 +66,7 @@
       </v-list>
     </v-navigation-drawer>
 
-    <v-app-bar app color="primary" dark>
+    <v-app-bar app color="black" dark>
       <v-app-bar-nav-icon @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
       <div class="d-flex align-center">
         <a
@@ -298,10 +298,10 @@ export default {
           self.objectToMove = null; // reset objectToMove
           self.wwd.redraw()
         }
-
       }
 
       if (self.canPlaceMarker && !self.canMoveMarker) {
+        console.log('place marker')
 
         // Perform the pick. Must first convert from window coordinates to canvas coordinates, which are
         // relative to the upper left corner of the canvas rather than the upper left corner of the page.
@@ -317,7 +317,7 @@ export default {
           annotation.displayName = "My Placemark";
           annotation.text = "Marker " + self.customMarkerCounter++;
           self.userPlacemarkLayer.addRenderable(annotation);
-
+          self.wwd.redraw()
           /*
           var placemark = new WorldWind.Placemark(position);
           console.log('placemark is ' + JSON.stringify(placemark))
