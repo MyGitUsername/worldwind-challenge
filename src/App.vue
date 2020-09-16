@@ -7,7 +7,6 @@
       <v-list dense>
         <v-list-item>
            <v-switch
-              v-model="activeWalmartLayer"
               label="Walmart"
               color="blue darken-1"
               v-on:click="triggerWalmartLayer()"
@@ -16,7 +15,6 @@
         </v-list-item>
         <v-list-item>
            <v-switch
-              v-model="activeTargetLayer"
               label="Target"
               color="red"
               v-on:click="triggerTargetLayer()"
@@ -33,7 +31,7 @@
             group
             >
             <v-row>
-            <v-btn @click="canPlaceMarker = !canPlaceMarker; canMoveMarker = false"
+            <v-btn @click="canPlaceMarker = !canPlaceMarker; canMoveMarker = false; objectToMove = null"
               outlined
               >
             Place Marker
@@ -125,8 +123,8 @@
 
 <script>
 import WorldWind from "@nasaworldwind/worldwind";
-import targetLocationsJson from "@/assets/target-locations.json";
-import walmartLocationsJson from "@/assets/walmart-locations.json";
+import targetLocationsJson from "@/assets/target.json";
+import walmartLocationsJson from "@/assets/walmart.json";
 
 export default {
   name: "WorldWiind",
@@ -150,21 +148,13 @@ export default {
 
   methods: {
     triggerWalmartLayer () {
-      console.log('activeWalmartLayer is ' + this.activeWalmartLayer)
-      if (!this.activeWalmartLayer) {
-        this.removeWalmartLocations();
-      } else {
-        this.wwd.addLayer(this.walmartLocationsPlacemarkLayer);
-      }
-
+      this.walmartLocationsPlacemarkLayer.enabled = !this.walmartLocationsPlacemarkLayer.enabled;
+      this.wwd.redraw();
     },
 
     triggerTargetLayer () {
-      if (!this.activeTargetLayer) {
-        this.removeTargetLocations();
-      } else {
-        this.wwd.addLayer(this.targetLocationsPlacemarkLayer);
-      }
+      this.walmartLocationsPlacemarkLayer.enabled = !this.walmartLocationsPlacemarkLayer.enabled;
+      this.wwd.redraw();
     },
 
     setAnnotationAttributes () {
@@ -216,14 +206,8 @@ export default {
 
       const self = this;
       targetLocationsJson.forEach(function(store) {
-        var position = new WorldWind.Position(store.latitude, store.longitude, 100.0);
+        var position = new WorldWind.Position(store.["Address.Latitude"], store["Address.Longitude"], 100.0);
         var placemark = new WorldWind.Placemark(position, false, placemarkAttributes);
-
-        /*
-        placemark.label = "Target\n" +
-          "Lat " + placemark.position.latitude.toPrecision(4).toString() + "\n" +
-          "Lon " + placemark.position.longitude.toPrecision(5).toString();
-        */
         placemark.alwaysOnTop = true;
 
         self.targetLocationsPlacemarkLayer.addRenderable(placemark);
@@ -237,17 +221,12 @@ export default {
       walmartLocationsJson.forEach(function(store) {
         var position = new WorldWind.Position(store.latitude, store.longitude, 100.0);
         var placemark = new WorldWind.Placemark(position, false, placemarkAttributes);
-
-        /*
-        placemark.label = "Walmart\n" +
-          "Lat " + placemark.position.latitude.toPrecision(4).toString() + "\n" +
-          "Lon " + placemark.position.longitude.toPrecision(5).toString();
-        */
         placemark.alwaysOnTop = true;
 
         self.walmartLocationsPlacemarkLayer.addRenderable(placemark);
       });
     },
+
     removeWalmartLocations () {
       this.wwd.removeLayer(this.walmartLocationsPlacemarkLayer)
     },
@@ -377,6 +356,6 @@ export default {
 </script>
 <style scoped>
 #canvasOne {
-  width: 70%;
+  /**/
 }
 </style>
