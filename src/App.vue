@@ -29,26 +29,27 @@
         <v-list-item>
           <v-btn-toggle
             tile
-            color="yellow"
             group
             >
             <v-row>
-            <v-tooltip right>
+            <v-tooltip top>
               <template v-slot:activator="{ on, attrs }">
                 <v-btn @click="canPlaceMarker = !canPlaceMarker; canMoveMarker = false; objectToMove = null"
                   outlined
+                  color="grey darken-4"
                   v-on="on"
                   v-bind="attrs"
                   >
                   Place Marker Mode
                 </v-btn>
               </template>
-            <span>Select this mode then click anywhere on the map to place a custom marker</span>
+            <span>Select this mode, then click on the map to place a custom marker</span>
             </v-tooltip>
-            <v-tooltip right>
+            <v-tooltip bottom>
               <template v-slot:activator="{ on, attrs }">
             <v-btn @click="canPlaceMarker = false; canMoveMarker = !canMoveMarker"
               outlined
+              color="grey darken-4"
               v-on="on"
               v-bind="attrs"
               >
@@ -131,8 +132,8 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
-      <v-container>
-        <canvas id="canvasOne" width="1024" height="768">
+      <v-container class="flex-grow-1">
+        <canvas id="canvasOne" class="flex-grow-1">
           Your browser does not support HTML5 Canvas.
         </canvas>
       </v-container>
@@ -262,6 +263,7 @@ export default {
     this.wwd = new WorldWind.WorldWindow("canvasOne");
     this.wwd.addLayer(new WorldWind.BMNGOneImageLayer());
     this.wwd.addLayer(new WorldWind.BMNGLandsatLayer());
+    this.wwd.addLayer(new WorldWind.StarFieldLayer());
 
     //Target Stores Placemark Layer
     this.targetLocationsPlacemarkLayer = new WorldWind.RenderableLayer();
@@ -369,9 +371,6 @@ export default {
 };
 </script>
 <style scoped>
-#canvasOne {
-  /**/
-}
 header {
   postion: absolute !important;
   top:0 !important;
@@ -386,5 +385,23 @@ nav, main{
 
 main {
   padding: 2rem;
+}
+
+div.container {
+  height: 100%;
+  width: 100%;
+  margin: 0px 0px 0px 0px;
+  padding-bottom: 0px;
+  padding-right: 0px;
+}
+
+#canvasOne {
+  background-color: black;
+  width: 100%;
+}
+
+.v-main {
+  padding-top: 0px !important;
+  padding-right: 0px !important;
 }
 </style>
