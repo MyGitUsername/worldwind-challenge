@@ -58,7 +58,7 @@
               Move Marker Mode
             </v-btn>
               </template>
-            <span>Select this mode, click on a custom marker, and then click a new location on the map</span>
+            <span>Select this mode, click on a custom marker, and then click on a new location on the map</span>
             </v-tooltip>
             </v-row>
           </v-btn-toggle>
