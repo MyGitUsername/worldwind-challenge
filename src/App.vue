@@ -29,20 +29,34 @@
         <v-list-item>
           <v-btn-toggle
             tile
-            color="yellow "
+            color="yellow"
             group
             >
             <v-row>
-            <v-btn @click="canPlaceMarker = !canPlaceMarker; canMoveMarker = false; objectToMove = null"
-              outlined
-              >
-            Place Marker
-            </v-btn>
+            <v-tooltip right>
+              <template v-slot:activator="{ on, attrs }">
+                <v-btn @click="canPlaceMarker = !canPlaceMarker; canMoveMarker = false; objectToMove = null"
+                  outlined
+                  v-on="on"
+                  v-bind="attrs"
+                  >
+                  Place Marker Mode
+                </v-btn>
+              </template>
+            <span>Select this mode then click anywhere on the map to place a custom marker</span>
+            </v-tooltip>
+            <v-tooltip right>
+              <template v-slot:activator="{ on, attrs }">
             <v-btn @click="canPlaceMarker = false; canMoveMarker = !canMoveMarker"
               outlined
+              v-on="on"
+              v-bind="attrs"
               >
-            Move Marker Mode
+              Move Marker Mode
             </v-btn>
+              </template>
+            <span>Select this mode, click on a custom marker, and then click on the map to move it</span>
+            </v-tooltip>
             </v-row>
           </v-btn-toggle>
         </v-list-item>
@@ -357,5 +371,20 @@ export default {
 <style scoped>
 #canvasOne {
   /**/
+}
+header {
+  postion: absolute !important;
+  top:0 !important;
+  left: 0 !important;
+  z-index: 99999 !important;
+}
+
+nav, main{
+  margin-top: 4rem !important;
+}
+
+
+main {
+  padding: 2rem;
 }
 </style>
