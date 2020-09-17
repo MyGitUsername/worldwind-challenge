@@ -53,7 +53,7 @@
             <v-btn @click="canPlaceMarker = false; canMoveMarker = !canMoveMarker"
               outlined
               color="grey"
-              active-class="background-color: white;"
+              active-class="btn-active"
               v-on="on"
               v-bind="attrs"
               class="ml-3"
@@ -106,6 +106,7 @@
 
     <v-main>
        <v-dialog
+      dark
       v-model="showEditAnnotationDialog"
       max-width="290"
     >
@@ -123,7 +124,7 @@
           <v-btn
             color="blue darken-1"
             text
-            @click="pickedObject.text = annotationText; showEditAnnotationDialog = false;"
+            @click="pickedObject.text = annotationText; showEditAnnotationDialog = false; wwd.redraw()"
           >
             Submit
           </v-btn>
@@ -194,7 +195,7 @@ export default {
         annotationAttributes.leaderGapHeight = 30;
         annotationAttributes.opacity = 1;
         annotationAttributes.scale = 1;
-        annotationAttributes.width = 200;
+        annotationAttributes.width = 150;
         annotationAttributes.height = 100;
         annotationAttributes.textAttributes.color = WorldWind.Color.BLACK;
         annotationAttributes.insets = new WorldWind.Insets(10, 10, 10, 10);
@@ -213,7 +214,6 @@ export default {
         placemarkAttributes.labelAttributes.color = WorldWind.Color.RED;
         placemarkAttributes.imageSource = "https://files.worldwind.arc.nasa.gov/artifactory/web/0.9.0/images/pushpins/plain-red.png"
         //placemarkAttributes.imageSource = WorldWind.WWUtil.currentUrlSansFilePart() + "./assets/pushpins/plain-red.png"
-        console.log('source ' + placemarkAttributes.imageSource)
       } else if (store === "walmart") {
         placemarkAttributes.labelAttributes.color = WorldWind.Color.BLUE;
         placemarkAttributes.imageSource = "https://files.worldwind.arc.nasa.gov/artifactory/web/0.9.0/images/pushpins/plain-blue.png"
@@ -303,9 +303,8 @@ export default {
         }
       }
 
+      // Place custom annotation marker on map
       if (self.canPlaceMarker && !self.canMoveMarker) {
-        console.log('place marker')
-
         // Perform the pick. Must first convert from window coordinates to canvas coordinates, which are
         // relative to the upper left corner of the canvas rather than the upper left corner of the page.
         const pickList = self.wwd.pick(self.wwd.canvasCoordinates(x, y));
@@ -313,7 +312,6 @@ export default {
         // If only one thing is picked and it is the terrain, tell the WorldWindow to go to the picked location.
         if (pickList.objects.length === 1 && pickList.objects[0].isTerrain) {
           const position = pickList.objects[0].position;
-          //const placemarkAttributes = self.defineLocationPlacemarkAttributes("user")
 
           const annotationAttributes = self.setAnnotationAttributes();
           const annotation = new WorldWind.Annotation(position, annotationAttributes);
@@ -321,25 +319,14 @@ export default {
           annotation.text = "Marker " + self.customMarkerCounter++;
           self.userPlacemarkLayer.addRenderable(annotation);
           self.wwd.redraw()
-          /*
-          var placemark = new WorldWind.Placemark(position);
-          console.log('placemark is ' + JSON.stringify(placemark))
-
-          placemark.label = "My Placemark\n" +
-            "Lat " + placemark.position.latitude.toPrecision(4).toString() + "\n" +
-            "Lon " + placemark.position.longitude.toPrecision(5).toString();
-          placemark.alwaysOnTop = true;
-          self.userPlacemarkLayer.addRenderable(placemark);
-          */
         }
       }
 
+      // Edit custom annotation marker
       if (!self.canPlaceMarker && !self.canMoveMarker) {
-
         // see what the user is picking
         var pickList = self.wwd.pick(self.wwd.canvasCoordinates(x, y));
         if (!pickList.hasNonTerrainObjects()) return;
-        console.log('get picklist ' + pickList.topPickedObject().userObject);
         const topPickedObject = pickList.topPickedObject().userObject;
         if (topPickedObject.text !== undefined) {  //FIXME: hacky solution to ignore placemarkers
           self.showEditAnnotationDialog = true;
@@ -356,7 +343,7 @@ export default {
 /* Avoid overlap of nav drawer and app-bar.  Source: https://codepen.io/hamedbaatour/pen/gOpwwjJ */
 header {
   postion: absolute !important;
-  top:0 !important;
+  top: 0 !important;
   left: 0 !important;
   z-index: 99999 !important;
 }
@@ -365,17 +352,9 @@ nav, main{
   margin-top: 4rem !important;
 }
 
-
 main {
   padding: 2rem;
 }
-
-/*
-.v-main {
-  max-height: calc(100% - 80px);
-  height: calc(100% - 80px);
-}
-*/
 
 div.container {
   postion: absolute !important;
@@ -392,11 +371,13 @@ div.container {
   width: 100%;
   max-height: 100%;
   min-height: 100%;
-
 }
 
 .v-main {
   padding-top: 0px !important;
   padding-right: 0px !important;
+}
+.btn-active {
+  color: white !important;
 }
 </style>
