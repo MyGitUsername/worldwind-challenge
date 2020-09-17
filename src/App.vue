@@ -39,6 +39,7 @@
                 <v-btn @click="canPlaceMarker = !canPlaceMarker; canMoveMarker = false; objectToMove = null"
                   outlined
                   color="grey"
+                  active-class="btn-active"
                   v-on="on"
                   v-bind="attrs"
                   class="ml-3"
