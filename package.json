@@ -10,6 +10,7 @@
   "dependencies": {
     "@nasaworldwind/worldwind": "^0.10.0",
     "core-js": "^3.6.5",
+    "node-forge": "^0.10.0",
     "vue": "^2.6.11",
     "vuetify": "^2.2.11"
   },
