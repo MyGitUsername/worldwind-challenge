@@ -1,69 +1,76 @@
 <template>
   <v-app>
-    <v-navigation-drawer
-      v-model="drawer"
-      color="black"
-      dark
-      app
-      >
+    <v-navigation-drawer v-model="drawer" color="black" dark app>
       <v-list dense>
         <v-list-item>
-           <v-switch
-              v-model="activeWalmartLayer"
-              label="Walmart"
-              color="blue darken-1"
-              v-on:click="triggerWalmartLayer()"
-              hide-details
-            ></v-switch>
+          <v-switch
+            v-model="activeWalmartLayer"
+            label="Walmart"
+            color="blue darken-1"
+            v-on:click="triggerWalmartLayer()"
+            hide-details
+          ></v-switch>
         </v-list-item>
         <v-list-item>
-           <v-switch
-              v-model="activeTargetLayer"
-              label="Target"
-              color="red"
-              v-on:click="triggerTargetLayer()"
-              hide-details
-            ></v-switch>
+          <v-switch
+            v-model="activeTargetLayer"
+            label="Target"
+            color="red"
+            v-on:click="triggerTargetLayer()"
+            hide-details
+          ></v-switch>
         </v-list-item>
         <v-list-item></v-list-item>
         <v-divider></v-divider>
         <v-list-item></v-list-item>
         <v-list-item>
-          <v-btn-toggle
-            tile
-            group
-            >
+          <v-btn-toggle tile group>
             <v-row>
-            <v-tooltip top>
-              <template v-slot:activator="{ on, attrs }">
-                <v-btn @click="canPlaceMarker = !canPlaceMarker; canMoveMarker = false; objectToMove = null"
-                  outlined
-                  color="grey"
-                  active-class="btn-active"
-                  v-on="on"
-                  v-bind="attrs"
-                  class="ml-3"
+              <v-tooltip top>
+                <template v-slot:activator="{ on, attrs }">
+                  <v-btn
+                    @click="
+                      canPlaceMarker = !canPlaceMarker;
+                      canMoveMarker = false;
+                      objectToMove = null;
+                    "
+                    outlined
+                    color="grey"
+                    active-class="btn-active"
+                    v-on="on"
+                    v-bind="attrs"
+                    class="ml-3"
                   >
-                  Place Marker Mode
-                </v-btn>
-              </template>
-            <span>Select this mode, then click on the map to place a custom marker</span>
-            </v-tooltip>
-            <v-tooltip bottom>
-              <template v-slot:activator="{ on, attrs }">
-            <v-btn @click="canPlaceMarker = false; canMoveMarker = !canMoveMarker"
-              outlined
-              color="grey"
-              active-class="btn-active"
-              v-on="on"
-              v-bind="attrs"
-              class="ml-3"
-              >
-              Move Marker Mode
-            </v-btn>
-              </template>
-            <span>Select this mode, click on a custom marker, and then click on a new location on the map</span>
-            </v-tooltip>
+                    Place Marker Mode
+                  </v-btn>
+                </template>
+                <span
+                  >Select this mode, then click on the map to place a custom
+                  marker</span
+                >
+              </v-tooltip>
+              <v-tooltip bottom>
+                <template v-slot:activator="{ on, attrs }">
+                  <v-btn
+                    @click="
+                      canPlaceMarker = false;
+                      canMoveMarker = !canMoveMarker;
+                    "
+                    outlined
+                    color="grey"
+                    active-class="btn-active"
+                    v-on="on"
+                    v-bind="attrs"
+                    class="ml-3"
+                  >
+                    Move Marker Mode
+                  </v-btn>
+                </template>
+                <span
+                  >Select this mode, click on a custom marker, and then click on
+                  a new location on the map</span
+                >
+              </v-tooltip>
             </v-row>
           </v-btn-toggle>
         </v-list-item>
@@ -73,26 +80,21 @@
     <v-app-bar app color="black" dark>
       <v-app-bar-nav-icon @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
       <div class="d-flex align-center">
-        <a
-          href="https://www.clostra.com/"
-        >
-        <v-img
-          alt="Clostra Logo"
-          class="shrink mr-2"
-          contain
-          src="@/assets/Clostra+Logo+White.png"
-          transition="scale-transition"
-          width="160"
-        />
-
+        <a href="https://www.clostra.com/">
+          <v-img
+            alt="Clostra Logo"
+            class="shrink mr-2"
+            contain
+            src="@/assets/Clostra+Logo+White.png"
+            transition="scale-transition"
+            width="160"
+          />
         </a>
       </div>
 
       <v-spacer></v-spacer>
 
-        <a
-          href="https://worldwind.arc.nasa.gov/"
-        >
+      <a href="https://worldwind.arc.nasa.gov/">
         <v-img
           alt="NASA Logo"
           class="shrink mr-2 nasa-logo"
@@ -101,44 +103,44 @@
           transition="scale-transition"
           width="70"
         />
-        </a>
-        <div>NASA WorldWind </div>
+      </a>
+      <div>NASA WorldWind</div>
     </v-app-bar>
 
     <v-main>
-       <v-dialog
-      dark
-      v-model="showEditAnnotationDialog"
-      max-width="290"
-    >
-      <v-card>
-        <v-card-title class="headline">Edit Marker</v-card-title>
+      <v-dialog dark v-model="showEditAnnotationDialog" max-width="290">
+        <v-card>
+          <v-card-title class="headline">Edit Marker</v-card-title>
 
           <v-text-field
-          v-model="annotationText"
-          value="Edit Annotation Text"
-          class="pl-6 pr-12"
-        ></v-text-field>
+            v-model="annotationText"
+            value="Edit Annotation Text"
+            class="pl-6 pr-12"
+          ></v-text-field>
 
-        <v-card-actions>
-          <v-spacer></v-spacer>
-          <v-btn
-            color="blue darken-1"
-            text
-            @click="pickedObject.text = annotationText; showEditAnnotationDialog = false; wwd.redraw()"
-          >
-            Submit
-          </v-btn>
-          <v-btn
-            color="blue darken-1"
-            text
-            @click="showEditAnnotationDialog = false"
-          >
-            Cancel
-          </v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn
+              color="blue darken-1"
+              text
+              @click="
+                pickedObject.text = annotationText;
+                showEditAnnotationDialog = false;
+                wwd.redraw();
+              "
+            >
+              Submit
+            </v-btn>
+            <v-btn
+              color="blue darken-1"
+              text
+              @click="showEditAnnotationDialog = false"
+            >
+              Cancel
+            </v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
       <v-container class="flex-grow-1">
         <canvas id="canvasOne" class="flex-grow-1">
           Your browser does not support HTML5 Canvas.
@@ -218,15 +220,13 @@ export default {
       } else if (store === "walmart") {
         placemarkAttributes.labelAttributes.color = WorldWind.Color.BLUE;
         placemarkAttributes.imageSource = "https://files.worldwind.arc.nasa.gov/artifactory/web/0.9.0/images/pushpins/plain-blue.png"
-      } else if (store === "user") {
-        placemarkAttributes.labelAttributes.color = WorldWind.Color.WHITE;
       }
 
       placemarkAttributes.labelAttributes.offset = new WorldWind.Offset(
         WorldWind.OFFSET_FRACTION, 0.5,
         WorldWind.OFFSET_FRACTION, 1.0);
 
-      placemarkAttributes.imageScale = .4; //Fixme
+      placemarkAttributes.imageScale = .4;
 
       return placemarkAttributes;
     },
@@ -316,7 +316,6 @@ export default {
 
           const annotationAttributes = self.setAnnotationAttributes();
           const annotation = new WorldWind.Annotation(position, annotationAttributes);
-          annotation.displayName = "My Placemark";
           annotation.text = "Marker " + self.customMarkerCounter++;
           self.userPlacemarkLayer.addRenderable(annotation);
           self.wwd.redraw()
@@ -349,7 +348,8 @@ header {
   z-index: 99999 !important;
 }
 
-nav, main{
+nav,
+main {
   margin-top: 4rem !important;
 }
 
